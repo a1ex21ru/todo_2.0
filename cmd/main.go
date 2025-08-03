@@ -49,7 +49,7 @@ func main() {
 
 func InitConfig() error {
 	viper.AddConfigPath("configs")
-	viper.SetConfigName("configs")
+	viper.SetConfigName("config")
 
 	return viper.ReadInConfig()
 }
