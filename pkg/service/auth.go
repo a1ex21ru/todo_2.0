@@ -9,6 +9,7 @@ import (
 	todo "github.com/alex21ru/todo_2.0"
 	"github.com/alex21ru/todo_2.0/pkg/repository"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -40,7 +41,7 @@ func (s *AuthService) GenerateToken(username, password string) (string, error) {
 
 	user, err := s.repo.GetUser(username, generatePasswordHash(password))
 	if err != nil {
-		return "", nil
+		return "", err
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
@@ -51,18 +52,22 @@ func (s *AuthService) GenerateToken(username, password string) (string, error) {
 		user.Id,
 	})
 
-	return token.SignedString([]byte(signingKey))
+	str, err := token.SignedString([]byte(signingKey))
+
+	logrus.Debugf("bearer token: %s, error: %s", str, err)
+
+	return str, err
 }
 
 func (s *AuthService) ParseToken(accessToken string) (int, error) {
-	token, err := jwt.ParseWithClaims(accessToken, &tokenClaims{}, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(accessToken, &tokenClaims{}, func(token *jwt.Token) (any, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("invalid signing method")
 		}
 		return []byte(signingKey), nil
 	})
 	if err != nil {
-		return 0, nil
+		return 0, err
 	}
 	claims, ok := token.Claims.(*tokenClaims)
 	if !ok {

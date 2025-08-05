@@ -2,7 +2,13 @@ package handler
 
 import (
 	"github.com/alex21ru/todo_2.0/pkg/service"
+
+	_ "github.com/alex21ru/todo_2.0/docs"
+
 	"github.com/gin-gonic/gin"
+
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 type Handler struct {
@@ -15,6 +21,8 @@ func NewHandler(services *service.Service) *Handler {
 
 func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
+
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	auth := router.Group("/auth")
 	{
@@ -36,10 +44,14 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			{
 				items.POST("/", h.createItem)
 				items.GET("/", h.getAllItems)
-				items.GET("/:item_id", h.getItemById)
-				items.PUT("/:item_id", h.updateItem)
-				items.DELETE("/:item_id", h.deleteItem)
+
 			}
+		}
+		items := api.Group("items")
+		{
+			items.GET("/:item_id", h.getItemById)
+			items.PUT("/:item_id", h.updateItem)
+			items.DELETE("/:item_id", h.deleteItem)
 		}
 	}
 	return router

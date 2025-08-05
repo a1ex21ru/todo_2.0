@@ -1,0 +1,482 @@
+basePath: /
+definitions:
+  handler.errorResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  handler.getAllListsResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/todo.TodoList'
+        type: array
+    type: object
+  handler.signInInput:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  handler.statusResponse:
+    properties:
+      status:
+        type: string
+    type: object
+  todo.TodoItem:
+    properties:
+      description:
+        type: string
+      done:
+        type: boolean
+      id:
+        type: integer
+      title:
+        type: string
+    required:
+    - title
+    type: object
+  todo.TodoList:
+    properties:
+      description:
+        type: string
+      id:
+        type: integer
+      title:
+        type: string
+    required:
+    - title
+    type: object
+  todo.UpdateItemInput:
+    properties:
+      description:
+        type: string
+      done:
+        type: string
+      title:
+        type: string
+    type: object
+  todo.UpdateListInput:
+    properties:
+      description:
+        type: string
+      title:
+        type: string
+    type: object
+  todo.User:
+    properties:
+      name:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - name
+    - password
+    - username
+    type: object
+host: localhost:8000
+info:
+  contact: {}
+  description: API Server for todolist app
+  title: Todo App API
+  version: "1.0"
+paths:
+  /api/items/{id}:
+    delete:
+      description: Удалить элемент по id
+      operationId: delete-item
+      parameters:
+      - description: ID элемента
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.statusResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Удалить элемент
+      tags:
+      - items
+    get:
+      description: Получить элемент по id
+      operationId: get-item-by-id
+      parameters:
+      - description: ID элемента
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/todo.TodoItem'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Получить элемент по id
+      tags:
+      - items
+    put:
+      consumes:
+      - application/json
+      description: Обновить данные элемента
+      operationId: update-item
+      parameters:
+      - description: ID элемента
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Данные для обновления элемента
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/todo.UpdateItemInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.statusResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Обновить элемент
+      tags:
+      - items
+  /api/lists:
+    get:
+      description: Получить все списки пользователя
+      operationId: get-all-lists
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.getAllListsResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Получить все списки
+      tags:
+      - lists
+    post:
+      consumes:
+      - application/json
+      description: Создать новый список задач
+      operationId: create-list
+      parameters:
+      - description: Список задач
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/todo.TodoList'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: id
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Создать новый список
+      tags:
+      - lists
+  /api/lists/{id}:
+    delete:
+      description: Удалить список задач по id
+      operationId: delete-list
+      parameters:
+      - description: ID списка
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.statusResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Удалить список
+      tags:
+      - lists
+    get:
+      description: Получить список задач по id
+      operationId: get-list-by-id
+      parameters:
+      - description: ID списка
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/todo.TodoList'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Получить список по id
+      tags:
+      - lists
+    put:
+      consumes:
+      - application/json
+      description: Обновить данные списка задач
+      operationId: update-list
+      parameters:
+      - description: ID списка
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Данные для обновления списка
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/todo.UpdateListInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.statusResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Обновить список
+      tags:
+      - lists
+  /api/lists/{id}/items:
+    get:
+      description: Получить все элементы по id списка
+      operationId: get-all-items
+      parameters:
+      - description: ID списка
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/todo.TodoItem'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Получить все элементы списка
+      tags:
+      - items
+    post:
+      consumes:
+      - application/json
+      description: Создать новый элемент в списке
+      operationId: create-item
+      parameters:
+      - description: ID списка
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Элемент
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/todo.TodoItem'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: id
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Создать новый элемент
+      tags:
+      - items
+  /auth/sign-in:
+    post:
+      consumes:
+      - application/json
+      description: Вход пользователя и получение JWT
+      operationId: login-user
+      parameters:
+      - description: Данные для входа
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handler.signInInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: token
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Авторизация пользователя
+      tags:
+      - auth
+  /auth/sign-up:
+    post:
+      consumes:
+      - application/json
+      description: Создать нового пользователя
+      operationId: create-user
+      parameters:
+      - description: Пользователь
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/todo.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: id
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Регистрация пользователя
+      tags:
+      - auth
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
